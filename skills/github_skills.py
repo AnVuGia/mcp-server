@@ -75,6 +75,45 @@ Follow these steps:
 """
 
 
+def read_github_project(scope: str, owner: str = "", repo: str = "", project_number: int = 0) -> str:
+    """
+    Prompt template: list GitHub Projects v2 or read one board with items and custom fields.
+    project_number 0 means list only; otherwise fetch that project.
+    """
+    list_hint = (
+        'Call `github_list_projects_v2` with scope, owner, repo, and first=30 (scope "viewer" ignores owner). '
+        "Summarize number, title, and url for each project."
+    )
+    if project_number == 0:
+        return f"""Read the user's GitHub Projects (v2) boards.
+
+1. {list_hint}
+2. If the user asked for a specific project by name or number, pick the matching entry from the list (or ask which one if ambiguous).
+3. If they only wanted a catalog, stop after the summary.
+
+Scope reference:
+- **viewer**: authenticated user's projects (empty owner)
+- **user**: another user's login in owner (rare)
+- **org**: organization login in owner
+- **repository**: owner = repo owner, repo = repository name
+"""
+
+    get_steps = (
+        f"Call `github_get_project_v2` with scope={scope!r}, owner={owner!r}, project_number={project_number}, "
+        f"repo={repo!r}, items_first=50. "
+    )
+    return f"""Read GitHub Project v2 #{project_number} for the given scope.
+
+1. {get_steps}
+2. Present a concise report:
+   - **Project**: title, url, short_description if present
+   - **Items table**: each row = title, type (Issue / PullRequest / DraftIssue), repository (if any), state, and **custom fields** (especially Status / iteration / priority when present in `fields`)
+3. If `items_page_info.has_next_page` is true, say how many items were shown and offer to call again with `items_after` set to `items_page_info.end_cursor` to load more.
+
+If the call fails with access errors, remind the user that `GITHUB_TOKEN` needs read access to GitHub Projects (classic PAT: `read:project`; fine-grained: Projects read).
+"""
+
+
 def onboard_repo(github_url: str) -> str:
     repo = _parse_repo_url(github_url)
     return f"""Give a developer onboarding overview of the GitHub repository {repo}.

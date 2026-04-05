@@ -88,6 +88,10 @@ Cursor manages the server process automatically via the MCP config, so you only 
 | `github_list_issues` | List issues in a repo (state: `open`, `closed`, `all`) |
 | `github_get_issue` | Get a specific issue by number |
 | `github_list_pull_requests` | List pull requests (state: `open`, `closed`, `all`) |
+| `github_list_projects_v2` | List GitHub Projects v2 boards (`scope`: `viewer`, `user`, `org`, `repository`) |
+| `github_get_project_v2` | Read one project: items, custom fields (e.g. Status), linked issues/PRs |
+
+For Projects, use a token with **`read:project`** (classic PAT) or fine-grained **Projects** read.
 
 ### Figma
 
@@ -124,6 +128,7 @@ Skills are prompt templates that tell Cursor AI exactly what steps to follow usi
 | `review_pr` | GitHub PR URL | Fetch PR details, analyze quality, write a structured review |
 | `summarize_issues` | GitHub repo URL | List open issues grouped by theme with top priorities |
 | `onboard_repo` | GitHub repo URL | Overview of stack, setup steps, and current open work |
+| `read_github_project` | scope, optional owner/repo, optional project number | List Projects v2 or read one board with items and fields |
 
 **Example:**
 ```

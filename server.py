@@ -1,5 +1,6 @@
+from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(Path(__file__).parent / ".env")
 
 from mcp.server.fastmcp import FastMCP
 from tools import github_tools, figma_tools, notion_tools
@@ -37,6 +38,37 @@ def github_get_issue(repo: str, number: int) -> dict:
 def github_list_pull_requests(repo: str, state: str = "open") -> list[dict]:
     """List pull requests in a GitHub repository. state: open | closed | all"""
     return github_tools.list_pull_requests(repo, state)
+
+
+@mcp.tool()
+def github_list_projects_v2(
+    scope: str,
+    owner: str = "",
+    repo: str = "",
+    first: int = 30,
+) -> list[dict]:
+    """List GitHub Projects v2 boards. scope: viewer | user | org | repository. For user/org, set owner to login; for repository, set owner and repo name."""
+    return github_tools.list_projects_v2(scope, owner, repo, first)
+
+
+@mcp.tool()
+def github_get_project_v2(
+    scope: str,
+    owner: str,
+    project_number: int,
+    repo: str = "",
+    items_first: int = 50,
+    items_after: str = "",
+) -> dict:
+    """Read one GitHub Project v2: items, Status and other field columns, linked issues/PRs. scope: viewer | org | user | repository. items_after: cursor from items_page_info.end_cursor for pagination."""
+    after = items_after or None
+    return github_tools.get_project_v2(scope, owner, project_number, repo, items_first, after)
+
+
+@mcp.tool()
+def github_add_project_v2_draft_issue(project_node_id: str, title: str, body: str = "") -> str:
+    """Add a draft issue to a GitHub Project v2 board. project_node_id is the GraphQL node ID (e.g. PVT_kwHOBj4MN84BTxbG) — get it from github_get_project_v2 or github_list_projects_v2. Returns the new item's node ID."""
+    return github_tools.add_project_v2_draft_issue(project_node_id, title, body)
 
 
 # ─── Figma ────────────────────────────────────────────────────────────────────
@@ -121,6 +153,17 @@ def summarize_issues(github_url: str) -> str:
 def onboard_repo(github_url: str) -> str:
     """Give a developer onboarding overview of a GitHub repo: stack, setup steps, and current work."""
     return github_skills.onboard_repo(github_url)
+
+
+@mcp.prompt()
+def read_github_project(
+    scope: str,
+    owner: str = "",
+    repo: str = "",
+    project_number: int = 0,
+) -> str:
+    """Read a GitHub Project v2 board: list projects if no number given, otherwise fetch items and fields."""
+    return github_skills.read_github_project(scope, owner, repo, project_number)
 
 
 @mcp.prompt()
