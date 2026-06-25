@@ -115,6 +115,13 @@ For Projects, use a token with **`read:project`** (classic PAT) or fine-grained 
 | `notion_get_database` | Get a database's schema by ID |
 | `notion_query_database` | Query all rows from a database |
 
+### Code Graph
+
+| Tool | Description |
+|------|-------------|
+| `code_graph_fetch_tree` | Fetch the file tree of a GitHub repository (flat list of files) |
+| `code_graph_build` | Build a code dependency graph: nodes (files) + edges (import relationships) |
+
 ---
 
 ## Skills
@@ -160,6 +167,21 @@ review_design https://www.figma.com/design/abc123/MyFile?node-id=1-2
 summarize_page https://notion.so/myworkspace/My-Page-a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
 ```
 
+### Code Graph Skills
+
+| Skill | Argument | Description |
+|-------|----------|-------------|
+| `code_graph` | GitHub repo URL | Full dependency graph: hub detection, clusters, isolated files, Mermaid viz |
+| `code_graph_for_language` | GitHub repo URL + language | Graph filtered to one language (e.g. `python`, `typescript`) |
+| `code_graph_subpath` | GitHub repo URL + subdirectory | Graph scoped to a single subdirectory |
+
+**Example:**
+```
+code_graph https://github.com/owner/repo
+code_graph_for_language https://github.com/owner/repo typescript
+code_graph_subpath https://github.com/owner/repo src/modules/auth
+```
+
 ---
 
 ## Adding a New Skill
@@ -178,11 +200,13 @@ mcp-server/
 ├── tools/             # API wrappers (called by Cursor via MCP tools)
 │   ├── github_tools.py
 │   ├── figma_tools.py
-│   └── notion_tools.py
+│   ├── notion_tools.py
+│   └── code_graph_tools.py
 ├── skills/            # Prompt templates (multi-step workflows for Cursor)
 │   ├── github_skills.py
 │   ├── figma_skills.py
-│   └── notion_skills.py
+│   ├── notion_skills.py
+│   └── code_graph_skills.py
 ├── requirements.txt
 ├── .env.example
 └── .env               # your tokens (not committed)
